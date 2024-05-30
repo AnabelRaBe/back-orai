@@ -1,0 +1,12 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "name": "msg",
+      "type": "eventHubTrigger",
+      "direction": "in",
+      "eventHubName": "innd1weuaehportalcrit001",
+      "connection": "AzureEventHubStorage"
+    }
+  ]
+}
