@@ -23,7 +23,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     Returns:
         func.HttpResponse: The HTTP response object.
     """
-    logging.info('Requested to start processing the conversation using langchain orchestrator')
+    logging.info('Requested to start processing the conversation using langchain orchestrator.')
     
     load_dotenv()
 
@@ -71,8 +71,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
                 response = create_response(messages, chat_followup_questions_list, os.getenv("AZURE_OPENAI_MODEL"))
                 answer_with_hyperlinks = hyperlinks.add_hyperlinks(response, answer_without_followup)
-                user_message = user_message.replace("'", "").replace('"', '')
-                answer_with_hyperlinks = answer_with_hyperlinks.replace("'", "").replace('"', '')
                 params = create_params(conversation_id, user_index_name, user_message, answer_with_hyperlinks, language, access_token, token_id)
                 save_chat_temp_url = urllib.parse.urljoin(os.getenv('BACKEND_URL', 'http://localhost:7071'), "/api/SaveConversation")
                 requests.post(save_chat_temp_url, json=params)
