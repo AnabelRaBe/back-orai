@@ -46,7 +46,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 now = datetime.datetime.now()
                 timestamptz = now.isoformat()
 
-                postgresql.update_data("conversations", f"topic = '{validated_body.topic}', modified_at = '{timestamptz}'",
+                topic = validated_body.topic.replace("'", "''")
+                postgresql.update_data("conversations", f"topic = '{topic}', modified_at = '{timestamptz}'",
                                         f"conversation_id = '{validated_body.conversation_id}' AND user_id = '{validated_body.user_id}'")
                 
                 postgresql.close_connection()
