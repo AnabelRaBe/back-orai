@@ -41,9 +41,10 @@ def set_message(request_body, postgresql, timestamptz):
     """
     if request_body.message:
         for message in request_body.message:
-            message = str(message).replace("'", '"')
+            message_str = json.dumps(message)
+            message_str = message_str.replace("'", "''")
             id_message = postgresql.get_max_id_by_conversation_id("messages", request_body.conversation_id) + 1
-            postgresql.insert_data("messages", f"'{request_body.conversation_id}', {id_message}, '{message}', '{timestamptz}'", "(conversation_id, id_message, message_text, created_at)")
+            postgresql.insert_data("messages", f"'{request_body.conversation_id}', {id_message}, '{message_str}', '{timestamptz}'", "(conversation_id, id_message, message_text, created_at)")
         postgresql.update_data("conversations", f"modified_at = '{timestamptz}'", f"conversation_id = '{request_body.conversation_id}' AND user_id = '{request_body.user_id}'")
     return postgresql
 
@@ -64,6 +65,7 @@ def set_topic(request_body, rows, postgresql, timestamptz):
         if history:
             generate_topic_tools = GenerateTopicTool()
             topic = generate_topic_tools.generate_topic(history, rows[0][1])
+            topic = topic.replace("'", "''")
             postgresql.update_data("conversations", f"topic = '{topic}', save_chat = '{request_body.save_chat}', modified_at = '{timestamptz}'", f"conversation_id = '{request_body.conversation_id}' AND user_id = '{request_body.user_id}'")
     return postgresql
 
