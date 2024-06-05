@@ -9,6 +9,7 @@ from .LLMHelper import LLMHelper
 from .EnvHelper import EnvHelper
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.indexes import SearchIndexClient
+from azure.search.documents.indexes.models import (SimpleField,SearchFieldDataType,SearchableField,SearchField,VectorSearch,HnswAlgorithmConfiguration,VectorSearchProfile)
 
 class AzureSearchHelper():
     def __init__(self, index_name: str):
@@ -44,7 +45,7 @@ class AzureSearchHelper():
                 type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
                 searchable=True,
                 vector_search_dimensions=len(llm_helper.get_embedding_model().embed_query("Text")),
-                vector_search_configuration="default",
+                vector_search_profile_name="myHnswProfile",
             ),
             SearchableField(
                 name="metadata",
@@ -151,6 +152,10 @@ class AzureSearchHelper():
                 filterable=True,
             )
         ]
+
+        vector_search = VectorSearch(algorithms=[HnswAlgorithmConfiguration(name="myHnsw")],
+                                    profiles=[VectorSearchProfile(name="myHnswProfile",
+                                                                  algorithm_configuration_name="myHnsw",)])
         
         return AzureSearch(
             azure_search_endpoint=self.service_endpoint,
@@ -159,6 +164,7 @@ class AzureSearchHelper():
             embedding_function=llm_helper.get_embedding_model().embed_query,
             fields=fields,
             user_agent="langchain chatwithyourdata-sa",
+            vector_search=vector_search,
         )
     
     def get_conversation_logger(self):
